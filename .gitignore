@@ -1,5 +1,7 @@
 *.py[cod]
 
+private/
+
 # C extensions
 *.so
 

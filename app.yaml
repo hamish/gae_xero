@@ -1,0 +1,19 @@
+application: gae-xero
+version: 1
+runtime: python27
+threadsafe: true
+api_version: 1
+
+libraries:
+- name: lxml  
+  version: "2.3"
+- name: pycrypto  
+  version: "2.3"
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
+  
+handlers:
+- url: /.*
+  script: xerointegration.application
