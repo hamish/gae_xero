@@ -4,7 +4,7 @@ gae_xero
 Playground for testing xero integration with google appenengine
 
 Ive stored private information in the private subdirectory. The following commands should get the system working:
-
+```
 mkdir private
 touch private/__init__.py
 echo "consumer_key='my_consumer_key'"> private/secret.py
@@ -13,6 +13,7 @@ cd private
 openssl genrsa -out privatekey.pem 1024
 openssl req -new -x509 -key privatekey.pem -out publickey.cer -days 1825
 openssl pkcs12 -export -out public_privatekey.pfx -inkey privatekey.pem -in publickey.cer
+```
 
 Links that may be useful:
 
