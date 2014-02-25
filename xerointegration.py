@@ -25,19 +25,23 @@ class Invoice(ndb.Model):
 
 class MakeInvoice(webapp2.RequestHandler):
     def get(self):
-        from private import secret
         template_values={}
         template = JINJA_ENVIRONMENT.get_template('make_invoice.html')
+        
+
+        from private import secret
         RSA_KEY_FILE="private/privatekey.pem"
         CONSUMER_KEY= secret.consumer_key
         
-        from xero.api import Xero
-        from xero.auth import PrivateCredentials
+        rsa_key=''
         with open(RSA_KEY_FILE) as keyfile:
             rsa_key = keyfile.read()
+            
+            
+        from xero import Xero
+        from xero.auth import PrivateCredentials
+        
         credentials = PrivateCredentials(CONSUMER_KEY, rsa_key)
-        logging.info(rsa_key)
-        logging.info(CONSUMER_KEY)
         xero = Xero(credentials)
         
         all_contacts = xero.contacts.all()

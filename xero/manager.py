@@ -153,8 +153,8 @@ class Manager(object):
 
     def _get_data(self, func):
         def wrapper(*args, **kwargs):
-            import urllib
-            from google.appengine.api import urlfetch
+            #import urllib
+            #from google.appengine.api import urlfetch
             
             uri, method, body, headers = func(*args, **kwargs)
             logging.info("_get_data:\n%s \n%s \n%s \n%s" % (uri, method, body, headers))
