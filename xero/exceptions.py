@@ -1,6 +1,6 @@
 from urlparse import parse_qs
 from xml.dom.minidom import parseString
-
+import logging
 
 class XeroException(Exception):
     def __init__(self, response, msg=None):
@@ -31,7 +31,8 @@ class XeroBadRequest(XeroException):
 class XeroUnauthorized(XeroException):
     # HTTP 401: Unauthorized
     def __init__(self, response):
-        payload = parse_qs(response.text)
+        logging.info(dir(response))
+        payload = parse_qs(response.content)
         self.problem = payload['oauth_problem'][0]
         super(XeroUnauthorized, self).__init__(response, payload['oauth_problem_advice'][0])
 

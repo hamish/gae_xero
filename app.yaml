@@ -5,9 +5,9 @@ threadsafe: true
 api_version: 1
 
 libraries:
+- name: pycrypto
+  version: latest
 - name: lxml  
-  version: "2.3"
-- name: pycrypto  
   version: "2.3"
 - name: webapp2
   version: latest

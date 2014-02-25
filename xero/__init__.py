@@ -1,9 +1,11 @@
+import logging 
 try:
     # This try-catch is necessary to make sure we can get
     # VERSION from the base xero module before all the
     # dependencies have been imported.
     from .api import Xero
 except ImportError:
+    logging.info("ImportError")
     pass
 
 NUM_VERSION = (0, 5, 2)

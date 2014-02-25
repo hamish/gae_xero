@@ -4,6 +4,7 @@ from datetime import datetime
 from dateutil.parser import parse
 import urllib
 import requests
+import logging
 from urlparse import parse_qs
 
 from .constants import XERO_API_URL
@@ -152,7 +153,17 @@ class Manager(object):
 
     def _get_data(self, func):
         def wrapper(*args, **kwargs):
+            import urllib
+            from google.appengine.api import urlfetch
+            
             uri, method, body, headers = func(*args, **kwargs)
+            logging.info("_get_data:\n%s \n%s \n%s \n%s" % (uri, method, body, headers))
+#            gmethod=urlfetch.GET
+#            response = urlfetch.fetch(url=uri,
+#                                    method=gmethod,
+#                                    auth=self.oauth
+#                                    )
+            
             response = getattr(requests, method)(uri, data=body, headers=headers, auth=self.oauth)
 
             if response.status_code == 200:
@@ -263,5 +274,7 @@ class Manager(object):
         return uri, 'get', None, headers
 
     def all(self):
+        import logging
         uri = '/'.join([XERO_API_URL, self.name])
+        logging.info("all: %s" % uri)
         return uri, 'get', None, None
