@@ -3,6 +3,7 @@ import jinja2
 import os
 from google.appengine.ext import ndb
 import logging
+import utils
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -28,23 +29,7 @@ class MakeInvoice(webapp2.RequestHandler):
         template_values={}
         template = JINJA_ENVIRONMENT.get_template('make_invoice.html')
         
-
-        from private import secret
-        RSA_KEY_FILE="private/privatekey.pem"
-        CONSUMER_KEY= secret.consumer_key
-        
-        rsa_key=''
-        with open(RSA_KEY_FILE) as keyfile:
-            rsa_key = keyfile.read()
-            
-            
-        from xero import Xero
-        from xero.auth import PrivateCredentials
-        
-        credentials = PrivateCredentials(CONSUMER_KEY, rsa_key)
-        xero = Xero(credentials)
-        
-        all_contacts = xero.contacts.all()
+        all_contacts=utils.get_contacts()
         logging.info(all_contacts)
         self.response.write(template.render(template_values))        
  
