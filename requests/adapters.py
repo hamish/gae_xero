@@ -303,7 +303,7 @@ class HTTPAdapter(BaseAdapter):
         """
 
         import logging
-        logging.info("adapters.send")
+#        logging.info("adapters.send")
         conn = self.get_connection(request.url, proxies)
 
         self.cert_verify(conn, request.url, verify, cert)
@@ -319,11 +319,11 @@ class HTTPAdapter(BaseAdapter):
 
         try:
             if not chunked:
-                logging.info("not chunked")
-                logging.info("method=%s" % request.method)
-                logging.info("url=%s" % url)
-                logging.info("body=%s" % request.body)
-                logging.info("headers=%s" % request.headers)
+#                logging.info("not chunked")
+#                logging.info("method=%s" % request.method)
+#                logging.info("url=%s" % url)
+#                logging.info("body=%s" % request.body)
+#                logging.info("headers=%s" % request.headers)
                     
                 resp = conn.urlopen(
                     method=request.method,
@@ -338,7 +338,9 @@ class HTTPAdapter(BaseAdapter):
                     timeout=timeout
                 )
 
-                logging.info(dir(resp))
+#                logging.info(dir(resp))
+                
+                
             # Send the request.
             else:
                 if hasattr(conn, 'proxy_pool'):
