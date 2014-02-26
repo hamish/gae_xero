@@ -14,7 +14,6 @@ openssl pkcs12 -export -out public_privatekey.pfx -inkey privatekey.pem -in publ
 touch __init__.py
 echo "consumer_key='my_consumer_key'"> secret.py
 echo "consumer_secret='my_secret_key'" >> secret.py
-echo rsa_data=\'\'\'`cat privatekey.pem`\`\`\`\ >> secret.py 
 
 
 ```
