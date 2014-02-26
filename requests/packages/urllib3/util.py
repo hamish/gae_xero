@@ -80,12 +80,13 @@ class Timeout(object):
     :type read: integer, float, or None
 
     :param total:
-        This combines the connect and read timeouts into one; the read timeout
-        will be set to the time leftover from the connect attempt. In the
+        The maximum amount of time to wait for an HTTP request to connect and
+        return. This combines the connect and read timeouts into one. In the
         event that both a connect timeout and a total are specified, or a read
         timeout and a total are specified, the shorter timeout will be applied.
 
         Defaults to None.
+
 
     :type total: integer, float, or None
 
@@ -100,23 +101,18 @@ class Timeout(object):
         `total`.
 
         In addition, the read and total timeouts only measure the time between
-        read operations on the socket connecting the client and the server,
-        not the total amount of time for the request to return a complete
-        response. For most requests, the timeout is raised because the server
-        has not sent the first byte in the specified time. This is not always
-        the case; if a server streams one byte every fifteen seconds, a timeout
-        of 20 seconds will not ever trigger, even though the request will
-        take several minutes to complete.
-
-        If your goal is to cut off any request after a set amount of wall clock
-        time, consider having a second "watcher" thread to cut off a slow
-        request.
+        read operations on the socket connecting the client and the server, not
+        the total amount of time for the request to return a complete response.
+        As an example, you may want a request to return within 7 seconds or
+        fail, so you set the ``total`` timeout to 7 seconds. If the server
+        sends one byte to you every 5 seconds, the request will **not** trigger
+        time out. This case is admittedly rare.
     """
 
     #: A sentinel object representing the default timeout value
     DEFAULT_TIMEOUT = _GLOBAL_DEFAULT_TIMEOUT
 
-    def __init__(self, total=None, connect=_Default, read=_Default):
+    def __init__(self, connect=_Default, read=_Default, total=None):
         self._connect = self._validate_timeout(connect, 'connect')
         self._read = self._validate_timeout(read, 'read')
         self.total = self._validate_timeout(total, 'total')
@@ -376,8 +372,7 @@ def parse_url(url):
 
     # Auth
     if '@' in url:
-        # Last '@' denotes end of auth part
-        auth, url = url.rsplit('@', 1)
+        auth, url = url.split('@', 1)
 
     # IPv6
     if url and url[0] == '[':
@@ -391,14 +386,10 @@ def parse_url(url):
         if not host:
             host = _host
 
-        if port:
-            # If given, ports must be integers.
-            if not port.isdigit():
-                raise LocationParseError("Failed to parse: %s" % url)
-            port = int(port)
-        else:
-            # Blank ports are cool, too. (rfc3986#section-3.2.3)
-            port = None
+        if not port.isdigit():
+            raise LocationParseError("Failed to parse: %s" % url)
+
+        port = int(port)
 
     elif not host and url:
         host = url
@@ -426,7 +417,7 @@ def get_host(url):
 
 
 def make_headers(keep_alive=None, accept_encoding=None, user_agent=None,
-                 basic_auth=None, proxy_basic_auth=None):
+                 basic_auth=None):
     """
     Shortcuts for generating request headers.
 
@@ -445,10 +436,6 @@ def make_headers(keep_alive=None, accept_encoding=None, user_agent=None,
 
     :param basic_auth:
         Colon-separated username:password string for 'authorization: basic ...'
-        auth header.
-
-    :param proxy_basic_auth:
-        Colon-separated username:password string for 'proxy-authorization: basic ...'
         auth header.
 
     Example: ::
@@ -477,10 +464,6 @@ def make_headers(keep_alive=None, accept_encoding=None, user_agent=None,
     if basic_auth:
         headers['authorization'] = 'Basic ' + \
             b64encode(six.b(basic_auth)).decode('utf-8')
-
-    if proxy_basic_auth:
-        headers['proxy-authorization'] = 'Basic ' + \
-            b64encode(six.b(proxy_basic_auth)).decode('utf-8')
 
     return headers
 
@@ -620,11 +603,6 @@ if SSLContext is not None:  # Python 3.2+
         """
         context = SSLContext(ssl_version)
         context.verify_mode = cert_reqs
-
-        # Disable TLS compression to migitate CRIME attack (issue #309)
-        OP_NO_COMPRESSION = 0x20000
-        context.options |= OP_NO_COMPRESSION
-
         if ca_certs:
             try:
                 context.load_verify_locations(ca_certs)
